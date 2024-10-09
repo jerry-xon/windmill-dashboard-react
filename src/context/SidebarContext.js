@@ -1,18 +1,20 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react';
 
-// create context
-export const SidebarContext = React.createContext()
+// Create context
+export const SidebarContext = React.createContext();
 
 export const SidebarProvider = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  function toggleSidebar() {
-    setIsSidebarOpen(!isSidebarOpen)
-  }
+  // Use useCallback to memoize toggleSidebar
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prevState => !prevState);
+  }, []);
 
-  function closeSidebar() {
-    setIsSidebarOpen(false)
-  }
+  // Use useCallback for closeSidebar too (optional)
+  const closeSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -20,8 +22,12 @@ export const SidebarProvider = ({ children }) => {
       toggleSidebar,
       closeSidebar,
     }),
-    [isSidebarOpen]
-  )
+    [isSidebarOpen, toggleSidebar, closeSidebar] // Dependencies include toggleSidebar and closeSidebar
+  );
 
-  return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
-}
+  return (
+    <SidebarContext.Provider value={value}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
